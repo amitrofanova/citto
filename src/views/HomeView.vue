@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import BooksTable from '../components/BooksTable.vue';
+import Button from 'primevue/button';
 
 const books = ref([]);
 const search = ref('');
@@ -10,10 +11,13 @@ const apiKey = 'AIzaSyBHiXBcVyWeK5JYQ-sUEItvoAJQLvEmdTQ';
 const urlBase = `https://www.googleapis.com/books/v1/volumes`;
 const currentIndex = ref(0);
 const loadingMore = ref(false); // Состояние загрузки дополнительных книг
-const itemsPerPage = 10; // Количество книг за один запрос
+const ITEMS_PER_PAGE = 10; // Количество книг за один запрос
 const hasMoreBooks = ref(false); // Есть ли ещё книги для загрузки
+const showError = ref(false);
+const errorText = '';
 
 const searchBooks = async () => {
+  showError.value = false;
   if (!search.value.trim()) return; // Не ищем, если запрос пустой
 
   const url = `${urlBase}?q=${encodeURIComponent(search.value)}&key=${apiKey}`;
@@ -31,18 +35,20 @@ const searchBooks = async () => {
       hasMoreBooks.value = data.totalItems > books.value.length; // Проверяем, есть ли ещё книги
     }
   } catch (error) {
-    console.error('Ошибка при поиске книг:', error);
+    showError.value = true;
+    errorText.value = error;
   } finally {
     loading.value = false;
   }
 };
 
 const loadMoreBooks = async () => {
+  showError.value = false;
   loadingMore.value = true;
-  currentIndex.value += itemsPerPage; // Увеличиваем индекс для следующей порции книг
+  currentIndex.value += ITEMS_PER_PAGE; // Увеличиваем индекс для следующей порции книг
 
   try {
-    const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(search.value)}&startIndex=${currentIndex.value}&maxResults=${itemsPerPage}&key=${apiKey}`;
+    const url = `${urlBase}?q=${encodeURIComponent(search.value)}&startIndex=${currentIndex.value}&maxResults=${ITEMS_PER_PAGE}&key=${apiKey}`;
 
     const response = await fetch(url);
     const data = await response.json();
@@ -53,27 +59,12 @@ const loadMoreBooks = async () => {
       hasMoreBooks.value = data.totalItems > books.value.length; // Проверяем, есть ли ещё книги
     }
   } catch (error) {
-    console.error('Ошибка при загрузке книг:', error);
+    showError.value = true;
+    errorText.value = error;
   } finally {
     loadingMore.value = false;
   }
 };
-
-// const loadMoreBooks = async () => {
-//   currentIndex.value += 10;
-//   const params = new URLSearchParams(url.search);
-//   console.log('params', params);
-//   params.set('startIndex', currentIndex.value.toString());
-
-//   const new_url = new URL(`${url.origin}${url.pathname}?${params}`);
-//   console.log(new_url);
-
-//   // const response = await fetch(new_url);
-//   // const result = await response.json();
-//   // const loadedBooks = makeArray(result.items);
-
-//   // books.value = [...books.value, ...loadedBooks];
-// };
 
 const makeArray = (data) => {
   return data?.map((item) => {
@@ -93,28 +84,14 @@ const makeArray = (data) => {
   <div>
     <h1>Поиск книг в Google Books</h1>
     <form @submit.prevent="searchBooks">
-      <input
-        type="text"
-        v-model="search"
-        placeholder="Введите название книги"
-        @keyup.enter="searchBooks"
-      />
+      <input type="text" v-model="search" placeholder="Введите название книги" />
       <button type="submit">Искать</button>
     </form>
-
     <div v-if="loading">Загрузка...</div>
-    <!-- <div v-else>
-      <ul v-if="books.length">
-        <li v-for="book in books" :key="book.id">
-          <strong>{{ book.volumeInfo.title }}</strong> - {{ book.volumeInfo.authors?.join(', ') }}
-        </li>
-      </ul>
-      <div v-else>Книги не найдены</div>
-    </div> -->
+    <BooksTable v-else-if="books.length" :books="books"></BooksTable>
+    <div v-if="showError">Книги не найдены</div>
   </div>
-  <BooksTable :books="books"></BooksTable>
-  <button @click="currentIndex += 10">next</button>
   <div v-if="hasMoreBooks" class="load-more">
-    <button @click="loadMoreBooks" :disabled="loadingMore">Загрузить ещё</button>
+    <Button @click="loadMoreBooks" :disabled="loadingMore" label="Загрузить ещё" />
   </div>
 </template>

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Button from 'primevue/button';
 import BookModal from './BookModal.vue';
 import Dialog from 'primevue/dialog';
 
@@ -40,11 +41,11 @@ const selectRow = (data) => {
     <Column field="publishedDate" header="publishedDate"></Column>
     <Column class="w-24 !text-end">
       <template #body="{ data }">
-        <Button icon="pi pi-search" @click="selectRow(data)" severity="secondary" rounded></Button>
+        <Button label="Открыть" @click="selectRow(data)" severity="secondary"></Button>
       </template>
     </Column>
   </DataTable>
-  <Dialog v-model:visible="isModalOpen" modal :style="{ width: '25rem', backgroundColor: '#fff' }">
+  <Dialog v-model:visible="isModalOpen" modal :style="{ width: '25rem' }">
     <BookModal :data="modalData"></BookModal>
   </Dialog>
 </template>
