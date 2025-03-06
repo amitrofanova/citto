@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import BooksTable from '../components/BooksTable.vue';
+import { Form } from '@primevue/forms';
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
 
 const books = ref([]);
 const search = ref('');
@@ -16,6 +18,9 @@ const hasMoreBooks = ref(false); // Есть ли ещё книги для за�
 const showError = ref(false);
 const errorText = '';
 
+/**
+ * Первоначальный поиск по книгам
+ */
 const searchBooks = async () => {
   showError.value = false;
   if (!search.value.trim()) return; // Не ищем, если запрос пустой
@@ -42,6 +47,9 @@ const searchBooks = async () => {
   }
 };
 
+/**
+ * Загрузка дополнительных книг
+ */
 const loadMoreBooks = async () => {
   showError.value = false;
   loadingMore.value = true;
@@ -66,6 +74,10 @@ const loadMoreBooks = async () => {
   }
 };
 
+/**
+ * Преобразование данных, полученных от API, в массив, пригодный для отображения в таблице
+ * @param {object} data - данные, полученные от API
+ */
 const makeArray = (data) => {
   return data?.map((item) => {
     return {
@@ -81,17 +93,25 @@ const makeArray = (data) => {
 </script>
 
 <template>
-  <div>
-    <h1>Поиск книг в Google Books</h1>
-    <form @submit.prevent="searchBooks">
-      <input type="text" v-model="search" placeholder="Введите название книги" />
-      <button type="submit">Искать</button>
-    </form>
+  <div class="grid place-items-center gap-12 p-40">
+    <h1 class="text-2xl font-extrabold">Поиск книг в Google Books</h1>
+    <Form @submit="searchBooks" class="flex gap-4">
+      <InputText type="text" v-model="search" placeholder="Введите название книги" class="w-140" />
+      <Button type="submit" label="Искать" class="max-w-fit" @click="searchBooks" />
+    </Form>
     <div v-if="loading">Загрузка...</div>
-    <BooksTable v-else-if="books.length" :books="books"></BooksTable>
     <div v-if="showError">Книги не найдены</div>
-  </div>
-  <div v-if="hasMoreBooks" class="load-more">
-    <Button @click="loadMoreBooks" :disabled="loadingMore" label="Загрузить ещё" />
+    <div v-else class="grid gap-12 w-6xl">
+      <BooksTable v-if="books.length" :books="books" />
+      <Button
+        v-if="hasMoreBooks"
+        :disabled="loadingMore"
+        :loading="loadingMore"
+        label="Загрузить ещё"
+        severity="secondary"
+        class="justify-self-end"
+        @click="loadMoreBooks"
+      />
+    </div>
   </div>
 </template>
