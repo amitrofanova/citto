@@ -27,7 +27,6 @@ const selectRow = (data) => {
 </script>
 
 <template>
-  <!-- <InputText name="search" type="text" placeholder="Поиск" fluid /> -->
   <!-- :virtualScrollerOptions="{ itemSize: 46, delay: 200, showLoader: true, loading: true, numToleratedItems: 10, lazy: true, onLazyLoad: loadBooksLazy }" -->
   <DataTable
     :value="books"

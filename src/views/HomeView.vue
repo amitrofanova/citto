@@ -16,14 +16,14 @@ const loadingMore = ref(false); // Состояние загрузки допо�
 const ITEMS_PER_PAGE = 10; // Количество книг за один запрос
 const hasMoreBooks = ref(false); // Есть ли ещё книги для загрузки
 const showError = ref(false);
-const errorText = '';
+const errorText = ref('');
 
 /**
  * Первоначальный поиск по книгам
  */
 const searchBooks = async () => {
   showError.value = false;
-  if (!search.value.trim()) return; // Не ищем, если запрос пустой
+  if (!search.value) return;
 
   const url = `${urlBase}?q=${encodeURIComponent(search.value)}&key=${apiKey}`;
 
@@ -76,7 +76,7 @@ const loadMoreBooks = async () => {
 
 /**
  * Преобразование данных, полученных от API, в массив, пригодный для отображения в таблице
- * @param {object} data - данные, полученные от API
+ * @param {object} data - данные, полученные через API
  */
 const makeArray = (data) => {
   return data?.map((item) => {
@@ -93,7 +93,12 @@ const makeArray = (data) => {
 </script>
 
 <template>
-  <div class="grid place-items-center gap-12 p-40">
+  <header class="flex justify-end p-6">
+    <Button label="Info" severity="info" variant="link">
+      <router-link :to="'/about'">About</router-link>
+    </Button>
+  </header>
+  <div class="grid place-items-center gap-12 p-30">
     <h1 class="text-2xl font-extrabold">Поиск книг в Google Books</h1>
     <Form @submit="searchBooks" class="flex gap-4">
       <InputText type="text" v-model="search" placeholder="Введите название книги" class="w-140" />
