@@ -1,35 +1,20 @@
-# citto
+# Тестовое задание на позицию Ведущий программист управления разработки, администрирования и технической поддержки ИС.
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Установка и запуск
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
+npm run format
 npm run dev
 ```
 
-### Compile and Minify for Production
+## Комментарии
 
-```sh
-npm run build
-```
+- Метод https://www.googleapis.com/books/v1/volumes не возвращает результат без query параметра, так что в приложении сначала осуществляется поиск, а потом отображение книг в табличном виде.
 
-### Lint with [ESLint](https://eslint.org/)
+- Бесконечный скролл срабатывает на PrimeVue DataTable сотни раз, хотя скролл не достигает низа
+  элемента. Пробовала и через virtualScrollerOptions, и простым обработчиком события. Буду
+  признательна, если поделитесь, как с этим справляетесь)
 
-```sh
-npm run lint
-```
+- Пункт "Редактирование наименования книги" не был реализован, так как Google Books API не
+  включает такую возможность. (Редактирование книги через Google Books API возможно только в том случае, если у вас есть права на управление этой книгой (например, если вы являетесь издателем или владельцем контента). Google Books API в основном предназначен для поиска и получения информации о книгах, а не для их редактирования.)
